@@ -133,8 +133,3 @@
 
 - 自动追踪：默认开启（基于 UIViewController 生命周期自动上报）
 - 手动追踪：LQPagePerfTracker.track(yourViewController)
-
-## 文档
-
-- 主要文档在 lqPerf.docc。
-- 示例 App 在 ExampleApp。
