@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'lqPerf'
-  s.version          = '0.1.0'
+  s.version          = '1.0.0'
   s.summary          = 'Lightweight iOS performance monitoring SDK.'
   s.description      = <<-DESC
 A lightweight iOS performance monitoring SDK with FPS/CPU/Memory/Lag/Network metrics, device info, crash linkage, and exporters.
