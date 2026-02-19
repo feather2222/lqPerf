@@ -28,42 +28,47 @@ public final class LQPerfOverlayController {
         #if canImport(UIKit)
         guard window == nil else { return }
 
-        if let scene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive }) {
-            let window = LQPerfOverlayWindow(windowScene: scene)
-            window.frame = CGRect(x: 12, y: 60, width: 200, height: 100)
+        if #available(iOS 13.0, *) {
+            if let scene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive }) {
+                let window = LQPerfOverlayWindow(windowScene: scene)
+                window.frame = CGRect(x: 12, y: 60, width: 200, height: 100)
 
-            window.windowLevel = .statusBar + 1
-            window.backgroundColor = .clear
-            window.layer.cornerRadius = 10
-            window.isUserInteractionEnabled = true
+                window.windowLevel = .statusBar + 1
+                window.backgroundColor = .clear
+                window.layer.cornerRadius = 10
+                window.isUserInteractionEnabled = true
 
-            let root = UIViewController()
-            root.view.frame = window.bounds
-            root.view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-            root.view.layer.cornerRadius = 10
-            root.view.clipsToBounds = true
-            root.view.isUserInteractionEnabled = true
-            window.rootViewController = root
-            window.isHidden = false
+                let root = UIViewController()
+                root.view.frame = window.bounds
+                root.view.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+                root.view.layer.cornerRadius = 10
+                root.view.clipsToBounds = true
+                root.view.isUserInteractionEnabled = true
+                window.rootViewController = root
+                window.isHidden = false
 
-            let label = UILabel(frame: root.view.bounds.insetBy(dx: 8, dy: 8))
-            label.numberOfLines = 0
-            label.textColor = .white
-            label.font = UIFont.monospacedSystemFont(ofSize: 12, weight: .medium)
-            label.isUserInteractionEnabled = false
-            root.view.addSubview(label)
+                let label = UILabel(frame: root.view.bounds.insetBy(dx: 8, dy: 8))
+                label.numberOfLines = 0
+                label.textColor = .white
+                label.font = UIFont.monospacedSystemFont(ofSize: 12, weight: .medium)
+                label.isUserInteractionEnabled = false
+                root.view.addSubview(label)
 
-            let button = UIButton(type: .custom)
-            button.frame = root.view.bounds
-            button.backgroundColor = .clear
-            button.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
-            root.view.addSubview(button)
+                let button = UIButton(type: .custom)
+                button.frame = root.view.bounds
+                button.backgroundColor = .clear
+                button.addTarget(self, action: #selector(handleTap), for: .touchUpInside)
+                root.view.addSubview(button)
 
-            self.window = window
-            self.label = label
+                self.window = window
+                self.label = label
+            } else {
+                return
+            }
         } else {
+            // iOS 12 及以下不支持悬浮窗
             return
         }
 
@@ -104,18 +109,28 @@ public final class LQPerfOverlayController {
     }
 
     private func topMostViewController() -> UIViewController? {
-        let scene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })
-
-        let windows = scene?.windows ?? UIApplication.shared.windows
-        let appWindow = windows.first(where: { $0.isKeyWindow && $0.windowLevel == .normal })
-            ?? windows.first(where: { $0.windowLevel == .normal })
-        var top = appWindow?.rootViewController
-        while let presented = top?.presentedViewController {
-            top = presented
+        if #available(iOS 13.0, *) {
+            let scene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive })
+            let windows = scene?.windows ?? UIApplication.shared.windows
+            let appWindow = windows.first(where: { $0.isKeyWindow && $0.windowLevel == .normal })
+                ?? windows.first(where: { $0.windowLevel == .normal })
+            var top = appWindow?.rootViewController
+            while let presented = top?.presentedViewController {
+                top = presented
+            }
+            return top
+        } else {
+            let windows = UIApplication.shared.windows
+            let appWindow = windows.first(where: { $0.isKeyWindow && $0.windowLevel == .normal })
+                ?? windows.first(where: { $0.windowLevel == .normal })
+            var top = appWindow?.rootViewController
+            while let presented = top?.presentedViewController {
+                top = presented
+            }
+            return top
         }
-        return top
     }
 
     private func format(_ value: Double?) -> String {

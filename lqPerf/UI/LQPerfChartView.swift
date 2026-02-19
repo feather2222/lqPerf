@@ -26,14 +26,21 @@ final class LQPerfChartView: UIView {
     }
 
     private func commonInit() {
-        backgroundColor = UIColor.systemGray6
+        if #available(iOS 13.0, *) {
+            backgroundColor = UIColor.systemGray6
+            maxLabel.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .medium)
+            minLabel.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .medium)
+            maxLabel.textColor = .secondaryLabel
+            minLabel.textColor = .secondaryLabel
+        } else {
+            backgroundColor = UIColor(white: 0.95, alpha: 1.0)
+            maxLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
+            minLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
+            maxLabel.textColor = .darkGray
+            minLabel.textColor = .darkGray
+        }
         layer.cornerRadius = 8
         layer.masksToBounds = true
-
-        maxLabel.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .medium)
-        minLabel.font = UIFont.monospacedSystemFont(ofSize: 11, weight: .medium)
-        maxLabel.textColor = .secondaryLabel
-        minLabel.textColor = .secondaryLabel
         addSubview(maxLabel)
         addSubview(minLabel)
     }
